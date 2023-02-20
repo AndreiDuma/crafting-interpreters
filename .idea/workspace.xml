@@ -5,10 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2168ba8d-e4b4-45ee-92cd-a722ccf38a1c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/RuntimeError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Environment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/1-statements.lox" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/2-variables.lox" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/3-scoping.lox" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/AstPrinter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/AstPrinter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Expr.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lox.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lox.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tool/GenerateAst.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tool/GenerateAst.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +48,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/Users/andrei/dev/_/crafting-interpreters/jlox/test",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -48,7 +56,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.selected.configurable": "project.propCompiler",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -56,8 +64,11 @@
     <key name="CreateClassDialog.RecentsKey">
       <recent name="" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test" />
+    </key>
   </component>
-  <component name="RunManager" selected="Application.Lox REPL">
+  <component name="RunManager" selected="Application.Lox file">
     <configuration name="GenerateAst" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tool.GenerateAst" />
       <module name="jlox" />
@@ -79,6 +90,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Lox file" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Lox" />
+      <module name="jlox" />
+      <option name="PROGRAM_PARAMETERS" value="test/3-scoping.lox" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -89,7 +108,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676130479628</updated>
       <workItem from="1676130480986" duration="20722000" />
-      <workItem from="1676629311754" duration="10956000" />
+      <workItem from="1676629311754" duration="26952000" />
     </task>
     <servers />
   </component>
