@@ -2,13 +2,15 @@
 
 module Syntax where
 
+import Data.Text (Text)
+
 data Expr
     = Grouping Expr
     | -- Literals
       LiteralNil
     | LiteralBoolean Bool
     | LiteralNumber Double
-    | LiteralString String
+    | LiteralString Text
     | -- Boolean operators
       Not Expr
     | And Expr Expr
@@ -28,7 +30,7 @@ data Expr
     | GreaterOrEqual Expr Expr
     deriving (Eq, Show)
 
-data Result = Nil | Boolean Bool | Number Double | String String
+data Result = Nil | Boolean Bool | Number Double | String Text
     deriving (Eq, Show)
 
 evaluate :: Expr -> Maybe Result -- evaluate LiteralT
@@ -62,7 +64,7 @@ evaluate = \case
         rightR <- evaluate right
         case (leftR, rightR) of
             (Number l, Number r) -> pure $ Number (l + r)
-            (String l, String r) -> pure $ String (l ++ r)
+            (String l, String r) -> pure $ String (l <> r)
             _ -> fail "Operands must be two numbers or two strings."
     Minus left right -> numberOperation (+) (evaluate left) (evaluate right)
     Star left right -> numberOperation (*) (evaluate left) (evaluate right)
