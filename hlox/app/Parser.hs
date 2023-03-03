@@ -2,9 +2,11 @@
 
 module Parser where
 
+import Data.Char (isAscii, isDigit, isLetter)
 import Data.Foldable (foldl')
 import Data.Function ((&))
 import Data.Text (Text)
+import Data.Text qualified as T
 import Data.Void (Void)
 import Syntax (Expr (..))
 import Text.Megaparsec
@@ -22,16 +24,22 @@ lexeme = L.lexeme spaceConsumer
 symbol :: Text -> Parser Text
 symbol = L.symbol spaceConsumer
 
---
-
-pExpr :: Parser Expr
-pExpr = spaceConsumer *> pEquality <* eof
-
 binaryExpr :: Parser Expr -> Parser (Expr -> Expr -> Expr) -> Parser Expr
 binaryExpr pOperand pBinaryCons = do
     left <- pOperand
     rest <- many (flip <$> pBinaryCons <*> pOperand)
     pure $ foldl' (&) left rest
+
+--
+
+pExpr :: Parser Expr
+pExpr = spaceConsumer *> pLogicOr <* eof
+
+pLogicOr :: Parser Expr
+pLogicOr = binaryExpr pLogicAnd (Or <$ symbol "or")
+
+pLogicAnd :: Parser Expr
+pLogicAnd = binaryExpr pEquality (And <$ symbol "and")
 
 pEquality :: Parser Expr
 pEquality = binaryExpr pComparison (Equal <$ symbol "==" <|> NotEqual <$ symbol "!=")
@@ -67,8 +75,19 @@ pPrimary =
         , pLiteralBoolean
         , pLiteralNumber
         , pLiteralString
+        , pIdentifier
         , pGrouping
         ]
+
+pIdentifier :: Parser Expr
+pIdentifier =
+    Identifier <$> do
+        first <- satisfy isAlpha
+        rest <- takeWhileP Nothing isAlphaOrDigit
+        lexeme . pure $ T.cons first rest
+  where
+    isAlpha c = isAscii c && isLetter c || c == '_'
+    isAlphaOrDigit c = isAlpha c || isDigit c
 
 pNil :: Parser Expr
 pNil = LiteralNil <$ symbol "nil"
@@ -84,6 +103,8 @@ pLiteralString = LiteralString <$> lexeme (single '"' *> takeWhileP Nothing (/= 
 
 pGrouping :: Parser Expr
 pGrouping = Grouping <$> (symbol "(" *> pExpr <* symbol ")")
+
+--
 
 test :: IO ()
 test = do

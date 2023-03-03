@@ -1,11 +1,21 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Syntax where
 
 import Data.Text (Text)
 
+newtype Program = Program [Declaration]
+
+data Declaration
+    = VarDeclaration Text Expr -- TODO
+    | Statement Stmt -- TODO
+    deriving (Eq, Show)
+
+data Stmt
+    = ExprStmt Expr -- TODO
+    | PrintStmt Expr -- TODO
+    deriving (Eq, Show)
+
 data Expr
-    = Grouping Expr
+    = Identifier Text
     | -- Literals
       LiteralNil
     | LiteralBoolean Bool
@@ -28,74 +38,11 @@ data Expr
     | LessOrEqual Expr Expr
     | Greater Expr Expr
     | GreaterOrEqual Expr Expr
+    | -- Assignment
+      Assignment Text Expr
+    | -- Parentheses
+      Grouping Expr
     deriving (Eq, Show)
-
-data Result = Nil | Boolean Bool | Number Double | String Text
-    deriving (Eq, Show)
-
-evaluate :: Expr -> Maybe Result -- evaluate LiteralT
-evaluate = \case
-    Grouping expr -> evaluate expr
-    -- Literals
-    LiteralNil -> pure Nil
-    LiteralBoolean b -> pure $ Boolean b
-    LiteralNumber n -> pure $ Number n
-    LiteralString s -> pure $ String s
-    -- Boolean operators
-    Not expr -> do
-        result <- evaluate expr
-        pure $ Boolean (isTruthy result)
-    And left right -> do
-        leftR <- evaluate left
-        rightR <- evaluate right
-        pure $ Boolean (isTruthy leftR && isTruthy rightR)
-    Or left right -> do
-        leftR <- evaluate left
-        rightR <- evaluate right
-        pure $ Boolean (isTruthy leftR || isTruthy rightR)
-    -- Number operators
-    Negate expr -> do
-        result <- evaluate expr
-        case result of
-            Number n -> pure $ Number (-n)
-            _ -> fail "Operand must be a number."
-    Plus left right -> do
-        leftR <- evaluate left
-        rightR <- evaluate right
-        case (leftR, rightR) of
-            (Number l, Number r) -> pure $ Number (l + r)
-            (String l, String r) -> pure $ String (l <> r)
-            _ -> fail "Operands must be two numbers or two strings."
-    Minus left right -> numberOperation (+) (evaluate left) (evaluate right)
-    Star left right -> numberOperation (*) (evaluate left) (evaluate right)
-    Slash left right -> numberOperation (/) (evaluate left) (evaluate right)
-    -- Comparison operators
-    Equal left right -> do
-        leftR <- evaluate left
-        rightR <- evaluate right
-        pure $ Boolean (leftR == rightR)
-    NotEqual left right -> numberComparison (/=) (evaluate left) (evaluate right)
-    Less left right -> numberComparison (<) (evaluate left) (evaluate right)
-    LessOrEqual left right -> numberComparison (<=) (evaluate left) (evaluate right)
-    Greater left right -> numberComparison (>) (evaluate left) (evaluate right)
-    GreaterOrEqual left right -> numberComparison (>=) (evaluate left) (evaluate right)
-  where
-    isTruthy expr = case expr of
-        Nil -> False
-        Boolean False -> False
-        _ -> True
-    numberOperation op left right = do
-        leftR <- left
-        rightR <- right
-        case (leftR, rightR) of
-            (Number l, Number r) -> pure $ Number (l `op` r)
-            _ -> fail "Operands must be numbers."
-    numberComparison op left right = do
-        leftR <- left
-        rightR <- right
-        case (leftR, rightR) of
-            (Number l, Number r) -> pure $ Boolean (l `op` r)
-            _ -> fail "Operands must be numbers."
 
 -- data Expr
 --     = LiteralExpr LiteralExpr
