@@ -67,13 +67,17 @@ executable hlox
         Parser
         Parser.Common
         Parser.Lexer
-        Interpreter
+        Eval
+        Eval.Common
+        Eval.Environment
+        Eval.Result
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
     build-depends:    base ^>=4.17.0.0,
+                      containers,
                       megaparsec ^>= 9.3.0,
                       mtl,
                       text

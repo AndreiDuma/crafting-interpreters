@@ -4,11 +4,11 @@ module Parser where
 
 import Parser.Common (Parser)
 import Parser.Lexer (lexeme, parseIdentifier, spaceConsumer, symbol)
+import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
 import Control.Applicative ((<|>))
 import Data.Foldable (foldl')
 import Data.Function ((&))
-import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, try)
 import Text.Megaparsec.Char.Lexer qualified as L
 
