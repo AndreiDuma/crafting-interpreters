@@ -8,7 +8,12 @@ import Data.Function ((&))
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Void (Void)
-import Syntax (Expr (..))
+import Syntax (
+    Declaration (..),
+    Expr (..),
+    Program (..),
+    Stmt (..),
+ )
 import Text.Megaparsec
 import Text.Megaparsec.Char (space1)
 import Text.Megaparsec.Char.Lexer qualified as L
@@ -30,10 +35,49 @@ binaryExpr pOperand pBinaryCons = do
     rest <- many (flip <$> pBinaryCons <*> pOperand)
     pure $ foldl' (&) left rest
 
---
+-- Program
+
+pProgram :: Parser Program
+pProgram = spaceConsumer *> (Program <$> many pDeclaration) <* eof
+
+-- Declaration
+
+pDeclaration :: Parser Declaration
+pDeclaration =
+    choice
+        [ pVarDecl
+        , pStatement
+        ]
+
+pVarDecl :: Parser Declaration
+pVarDecl =
+    VarDecl
+        <$> (symbol "var" *> parseIdentifier)
+        <*> optional (symbol "=" *> pExpr)
+        <* symbol ";"
+
+pStatement :: Parser Declaration
+pStatement = Statement <$> pStmt
+
+-- Stmt
+
+pStmt :: Parser Stmt
+pStmt =
+    choice
+        [ pPrintStmt
+        , pExprStmt
+        ]
+
+pPrintStmt :: Parser Stmt
+pPrintStmt = PrintStmt <$> (symbol "print" *> pExpr <* symbol ";")
+
+pExprStmt :: Parser Stmt
+pExprStmt = ExprStmt <$> (pExpr <* symbol ";")
+
+-- Expr
 
 pExpr :: Parser Expr
-pExpr = spaceConsumer *> pLogicOr <* eof
+pExpr = pLogicOr
 
 pLogicOr :: Parser Expr
 pLogicOr = binaryExpr pLogicAnd (Or <$ symbol "or")
@@ -80,14 +124,7 @@ pPrimary =
         ]
 
 pIdentifier :: Parser Expr
-pIdentifier =
-    Identifier <$> do
-        first <- satisfy isAlpha
-        rest <- takeWhileP Nothing isAlphaOrDigit
-        lexeme . pure $ T.cons first rest
-  where
-    isAlpha c = isAscii c && isLetter c || c == '_'
-    isAlphaOrDigit c = isAlpha c || isDigit c
+pIdentifier = Identifier <$> parseIdentifier
 
 pNil :: Parser Expr
 pNil = LiteralNil <$ symbol "nil"
@@ -104,11 +141,13 @@ pLiteralString = LiteralString <$> lexeme (single '"' *> takeWhileP Nothing (/= 
 pGrouping :: Parser Expr
 pGrouping = Grouping <$> (symbol "(" *> pExpr <* symbol ")")
 
---
+-- Lexing
 
-test :: IO ()
-test = do
-    let
-        parser = pExpr
-        input = "-123"
-    parseTest parser input
+parseIdentifier :: Parser Text
+parseIdentifier = do
+    first <- satisfy isAlpha
+    rest <- takeWhileP Nothing isAlphaOrDigit
+    lexeme . pure $ T.cons first rest
+  where
+    isAlpha c = isAscii c && isLetter c || c == '_'
+    isAlphaOrDigit c = isAlpha c || isDigit c

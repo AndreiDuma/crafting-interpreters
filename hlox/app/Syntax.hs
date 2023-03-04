@@ -3,15 +3,16 @@ module Syntax where
 import Data.Text (Text)
 
 newtype Program = Program [Declaration]
+    deriving (Eq, Show)
 
 data Declaration
-    = VarDeclaration Text Expr -- TODO
-    | Statement Stmt -- TODO
+    = VarDecl Text (Maybe Expr)
+    | Statement Stmt
     deriving (Eq, Show)
 
 data Stmt
-    = ExprStmt Expr -- TODO
-    | PrintStmt Expr -- TODO
+    = ExprStmt Expr
+    | PrintStmt Expr
     deriving (Eq, Show)
 
 data Expr
@@ -43,38 +44,3 @@ data Expr
     | -- Parentheses
       Grouping Expr
     deriving (Eq, Show)
-
--- data Expr
---     = LiteralExpr LiteralExpr
---     | UnaryExpr UnaryExpr
---     | BinaryExpr BinaryExpr
---     | GroupingExpr Expr
---     deriving (Eq, Show)
-
--- data LiteralExpr
---     = LiteralTrue
---     | LiteralFalse
---     | LiteralNil
---     | LiteralNumber Double
---     | LiteralString String
---     deriving (Eq, Show)
-
--- data UnaryExpr
---     = UnaryMinus Expr
---     | Bang Expr
---     deriving (Eq, Show)
-
--- data BinaryExpr
---     = Expr `Plus` Expr
---     | Expr `Minus` Expr
---     | Expr `Star` Expr
---     | Expr `Slash` Expr
---     | Expr `And` Expr
---     | Expr `Or` Expr
---     | Expr `Equal` Expr
---     | Expr `NotEqual` Expr
---     | Expr `LessThan` Expr
---     | Expr `LessThanOrEqual` Expr
---     | Expr `GreaterThan` Expr
---     | Expr `GreaterThanOrEqual` Expr
---     deriving (Eq, Show)

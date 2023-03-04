@@ -1,8 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Interpreter where
 
-import Control.Monad.Except (ExceptT, runExcept)
+import Control.Monad.Except (ExceptT, MonadError (throwError), runExcept)
 import Control.Monad.Identity (Identity)
 import Data.Text (Text)
 import Syntax (Expr (..))
@@ -15,7 +16,7 @@ type Eval a = ExceptT Text Identity a
 runEval :: Eval a -> Either Text a
 runEval = runExcept
 
-evaluate :: Expr -> Maybe Result
+evaluate :: Expr -> Eval Result
 evaluate = \case
     Identifier name -> pure Nil -- TODO: read value from environment
     -- Literals
@@ -42,14 +43,14 @@ evaluate = \case
         result <- evaluate expr
         case result of
             Number n -> pure $ Number (-n)
-            _ -> fail "Operand must be a number."
+            _ -> throwError "Operand must be a number."
     Plus left right -> do
         leftR <- evaluate left
         rightR <- evaluate right
         case (leftR, rightR) of
             (Number l, Number r) -> pure $ Number (l + r)
             (String l, String r) -> pure $ String (l <> r)
-            _ -> fail "Operands must be two numbers or two strings."
+            _ -> throwError "Operands must be two numbers or two strings."
     Minus left right -> numberOperation (+) (evaluate left) (evaluate right)
     Star left right -> numberOperation (*) (evaluate left) (evaluate right)
     Slash left right -> numberOperation (/) (evaluate left) (evaluate right)
@@ -80,10 +81,10 @@ evaluate = \case
         rightR <- right
         case (leftR, rightR) of
             (Number l, Number r) -> pure $ Number (l `op` r)
-            _ -> fail "Operands must be numbers."
+            _ -> throwError "Operands must be numbers."
     numberComparison op left right = do
         leftR <- left
         rightR <- right
         case (leftR, rightR) of
             (Number l, Number r) -> pure $ Boolean (l `op` r)
-            _ -> fail "Operands must be numbers."
+            _ -> throwError "Operands must be numbers."
