@@ -2,8 +2,9 @@
 
 module Main where
 
+import Parser (programP)
+
 import Data.Text.IO qualified as T
-import Parser (pProgram)
 import System.Environment (getArgs)
 import System.IO (stderr)
 import Text.Megaparsec (errorBundlePretty, parse)
@@ -19,6 +20,6 @@ runFile :: String -> IO ()
 runFile path = do
     source <- T.readFile path
     print source
-    case parse pProgram path source of
+    case parse programP path source of
         Left err -> putStrLn $ errorBundlePretty err
-        Right result -> print result
+        Right program -> print program

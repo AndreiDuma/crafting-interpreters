@@ -2,95 +2,72 @@
 
 module Parser where
 
-import Data.Char (isAscii, isDigit, isLetter)
+import Parser.Common (Parser)
+import Parser.Lexer (lexeme, parseIdentifier, spaceConsumer, symbol)
+
+import Control.Applicative ((<|>))
 import Data.Foldable (foldl')
 import Data.Function ((&))
-import Data.Text (Text)
-import Data.Text qualified as T
-import Data.Void (Void)
-import Syntax (
-    Declaration (..),
-    Expr (..),
-    Program (..),
-    Stmt (..),
- )
-import Text.Megaparsec
-import Text.Megaparsec.Char (space1)
+import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
+import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, try)
 import Text.Megaparsec.Char.Lexer qualified as L
-
-type Parser = Parsec Void Text
-
-spaceConsumer :: Parser ()
-spaceConsumer = L.space space1 (L.skipLineComment "//") empty
-
-lexeme :: Parser a -> Parser a
-lexeme = L.lexeme spaceConsumer
-
-symbol :: Text -> Parser Text
-symbol = L.symbol spaceConsumer
-
-binaryExpr :: Parser Expr -> Parser (Expr -> Expr -> Expr) -> Parser Expr
-binaryExpr pOperand pBinaryCons = do
-    left <- pOperand
-    rest <- many (flip <$> pBinaryCons <*> pOperand)
-    pure $ foldl' (&) left rest
 
 -- Program
 
-pProgram :: Parser Program
-pProgram = spaceConsumer *> (Program <$> many pDeclaration) <* eof
+programP :: Parser Program
+programP = spaceConsumer *> (Program <$> many declarationP) <* eof
 
 -- Declaration
 
-pDeclaration :: Parser Declaration
-pDeclaration =
+declarationP :: Parser Declaration
+declarationP =
     choice
-        [ pVarDecl
-        , pStatement
+        [ varDeclP
+        , statementP
         ]
 
-pVarDecl :: Parser Declaration
-pVarDecl =
+varDeclP :: Parser Declaration
+varDeclP =
     VarDecl
         <$> (symbol "var" *> parseIdentifier)
-        <*> optional (symbol "=" *> pExpr)
+        <*> optional (symbol "=" *> exprP)
         <* symbol ";"
 
-pStatement :: Parser Declaration
-pStatement = Statement <$> pStmt
+statementP :: Parser Declaration
+statementP = Statement <$> stmtP
 
 -- Stmt
 
-pStmt :: Parser Stmt
-pStmt =
+stmtP :: Parser Stmt
+stmtP =
     choice
-        [ pPrintStmt
-        , pExprStmt
+        [ printStmtP
+        , exprStmtP
         ]
 
-pPrintStmt :: Parser Stmt
-pPrintStmt = PrintStmt <$> (symbol "print" *> pExpr <* symbol ";")
+printStmtP :: Parser Stmt
+printStmtP = PrintStmt <$> (symbol "print" *> exprP <* symbol ";")
 
-pExprStmt :: Parser Stmt
-pExprStmt = ExprStmt <$> (pExpr <* symbol ";")
+exprStmtP :: Parser Stmt
+exprStmtP = ExprStmt <$> (exprP <* symbol ";")
 
 -- Expr
 
-pExpr :: Parser Expr
-pExpr = pLogicOr
+exprP :: Parser Expr
+exprP = logicOrP
 
-pLogicOr :: Parser Expr
-pLogicOr = binaryExpr pLogicAnd (Or <$ symbol "or")
+logicOrP :: Parser Expr
+logicOrP = binaryExpr logicAndP (Or <$ symbol "or")
 
-pLogicAnd :: Parser Expr
-pLogicAnd = binaryExpr pEquality (And <$ symbol "and")
+logicAndP :: Parser Expr
+logicAndP = binaryExpr equalityP (And <$ symbol "and")
 
-pEquality :: Parser Expr
-pEquality = binaryExpr pComparison (Equal <$ symbol "==" <|> NotEqual <$ symbol "!=")
+equalityP :: Parser Expr
+equalityP = binaryExpr comparisonP (Equal <$ symbol "==" <|> NotEqual <$ symbol "!=")
 
-pComparison :: Parser Expr
-pComparison =
-    binaryExpr pTerm $
+comparisonP :: Parser Expr
+comparisonP =
+    binaryExpr termP $
         choice
             [ Greater <$ symbol ">"
             , GreaterOrEqual <$ symbol ">="
@@ -98,56 +75,53 @@ pComparison =
             , LessOrEqual <$ symbol "<="
             ]
 
-pTerm :: Parser Expr
-pTerm = binaryExpr pFactor (Plus <$ symbol "+" <|> Minus <$ symbol "-")
+termP :: Parser Expr
+termP = binaryExpr factorP (Plus <$ symbol "+" <|> Minus <$ symbol "-")
 
-pFactor :: Parser Expr
-pFactor = binaryExpr pUnary (Star <$ symbol "*" <|> Slash <$ symbol "/")
+factorP :: Parser Expr
+factorP = binaryExpr unaryP (Star <$ symbol "*" <|> Slash <$ symbol "/")
 
-pUnary :: Parser Expr
-pUnary =
+unaryP :: Parser Expr
+unaryP =
     choice
-        [ Not <$> (symbol "!" *> pUnary)
-        , Negate <$> (symbol "-" *> pUnary)
-        , pPrimary
+        [ Not <$> (symbol "!" *> unaryP)
+        , Negate <$> (symbol "-" *> unaryP)
+        , primaryP
         ]
 
-pPrimary :: Parser Expr
-pPrimary =
+primaryP :: Parser Expr
+primaryP =
     choice
-        [ pNil
-        , pLiteralBoolean
-        , pLiteralNumber
-        , pLiteralString
-        , pIdentifier
-        , pGrouping
+        [ nilP
+        , literalBooleanP
+        , literalNumberP
+        , literalStringP
+        , identifierP
+        , groupingP
         ]
 
-pIdentifier :: Parser Expr
-pIdentifier = Identifier <$> parseIdentifier
+identifierP :: Parser Expr
+identifierP = Identifier <$> parseIdentifier
 
-pNil :: Parser Expr
-pNil = LiteralNil <$ symbol "nil"
+nilP :: Parser Expr
+nilP = LiteralNil <$ symbol "nil"
 
-pLiteralBoolean :: Parser Expr
-pLiteralBoolean = LiteralBoolean <$> (True <$ symbol "true" <|> False <$ symbol "false")
+literalBooleanP :: Parser Expr
+literalBooleanP = LiteralBoolean <$> (True <$ symbol "true" <|> False <$ symbol "false")
 
-pLiteralNumber :: Parser Expr
-pLiteralNumber = LiteralNumber <$> lexeme (try L.float <|> L.decimal)
+literalNumberP :: Parser Expr
+literalNumberP = LiteralNumber <$> lexeme (try L.float <|> L.decimal)
 
-pLiteralString :: Parser Expr
-pLiteralString = LiteralString <$> lexeme (single '"' *> takeWhileP Nothing (/= '"') <* single '"')
+literalStringP :: Parser Expr
+literalStringP = LiteralString <$> lexeme (single '"' *> takeWhileP Nothing (/= '"') <* single '"')
 
-pGrouping :: Parser Expr
-pGrouping = Grouping <$> (symbol "(" *> pExpr <* symbol ")")
+groupingP :: Parser Expr
+groupingP = Grouping <$> (symbol "(" *> exprP <* symbol ")")
 
--- Lexing
+-- Utilities
 
-parseIdentifier :: Parser Text
-parseIdentifier = do
-    first <- satisfy isAlpha
-    rest <- takeWhileP Nothing isAlphaOrDigit
-    lexeme . pure $ T.cons first rest
-  where
-    isAlpha c = isAscii c && isLetter c || c == '_'
-    isAlphaOrDigit c = isAlpha c || isDigit c
+binaryExpr :: Parser Expr -> Parser (Expr -> Expr -> Expr) -> Parser Expr
+binaryExpr operandP binaryConsP = do
+    left <- operandP
+    rest <- many (flip <$> binaryConsP <*> operandP)
+    pure $ foldl' (&) left rest
