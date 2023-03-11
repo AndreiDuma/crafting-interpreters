@@ -2,7 +2,7 @@
 
 module Parser.Lexer where
 
-import Parser.Common (Parser)
+import Parser.Type (Parser)
 
 import Control.Applicative ((<|>))
 import Data.Char (isAscii, isDigit, isLetter)

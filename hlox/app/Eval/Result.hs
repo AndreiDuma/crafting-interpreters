@@ -1,4 +1,6 @@
-module Eval.Result where
+module Eval.Result (
+    Result (..),
+) where
 
 import Data.Text (Text)
 

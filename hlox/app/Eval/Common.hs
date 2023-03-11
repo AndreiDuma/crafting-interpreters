@@ -1,7 +1,15 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Eval.Common where
+module Eval.Common (
+    Eval,
+    runEval,
+    evalEval,
+    getVariable,
+    defineVariable,
+    assignVariable,
+    printValue,
+) where
 
 import Eval.Environment (Environment, assignVar, defineVar, getVar)
 import Eval.Result (Result (..))

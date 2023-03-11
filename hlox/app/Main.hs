@@ -6,12 +6,12 @@ module Main where
 import Eval (evaluateProgram)
 import Eval.Common (evalEval)
 import Eval.Environment (empty)
-import Parser (programP)
+import Parser (parseProgram, parserErrorPretty)
 
 import Data.Text.IO qualified as TIO
 import System.Environment (getArgs)
+import System.Exit (exitFailure)
 import System.IO (stderr)
-import Text.Megaparsec (errorBundlePretty, parse)
 
 main :: IO ()
 main = do
@@ -23,9 +23,9 @@ main = do
 runFile :: String -> IO ()
 runFile path = do
     source <- TIO.readFile path
-    case parse programP path source of
-        Left err -> putStrLn $ errorBundlePretty err
-        Right program -> do
-            evalEval (evaluateProgram program) empty >>= \case
-                Left err -> TIO.putStrLn err
-                _ -> pure ()
+    program <- case parseProgram path source of
+        Left err -> TIO.hPutStrLn stderr (parserErrorPretty err) >> exitFailure
+        Right program -> pure program
+    evalEval (evaluateProgram program) empty >>= \case
+        Left err -> TIO.hPutStrLn stderr err
+        _ -> pure ()

@@ -1,4 +1,4 @@
-module Parser.Common where
+module Parser.Type (Parser) where
 
 import Data.Text (Text)
 import Data.Void (Void)

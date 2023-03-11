@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Eval where
+module Eval (evaluateProgram) where
 
 import Eval.Common (Eval, assignVariable, defineVariable, getVariable, printValue)
 import Eval.Result (Result (..))
@@ -10,6 +10,8 @@ import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 import Control.Monad (void)
 import Control.Monad.Except (throwError)
 import Data.Foldable (traverse_)
+
+-- TODO: create a Program -> Either RuntimeError Program function, then don't export the monad
 
 evaluateProgram :: Program -> Eval ()
 evaluateProgram (Program declarations) = traverse_ evaluateDeclaration declarations
