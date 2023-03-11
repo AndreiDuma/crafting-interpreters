@@ -1,4 +1,9 @@
-module Syntax where
+module Syntax (
+    Program (..),
+    Declaration (..),
+    Stmt (..),
+    Expr (..),
+) where
 
 import Data.Text (Text)
 

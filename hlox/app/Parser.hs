@@ -1,15 +1,17 @@
-module Parser where
+module Parser (
+    Parser,
+    ParserError,
+    parseProgram,
+    parserErrorPretty,
+) where
 
-import Parser.Program (programP)
+import Parser.Parsers (programP)
+import Parser.Type (Parser, ParserError)
 import Syntax (Program)
 
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Void (Void)
 import Text.Megaparsec (errorBundlePretty, parse)
-import Text.Megaparsec.Error (ParseErrorBundle)
-
-type ParserError = ParseErrorBundle Text Void
 
 parserErrorPretty :: ParserError -> Text
 parserErrorPretty = T.pack . errorBundlePretty

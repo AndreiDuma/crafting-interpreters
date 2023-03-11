@@ -67,10 +67,7 @@ executable hlox
         Parser
         Parser.Type
         Parser.Lexer
-        Parser.Program
-        Parser.Declaration
-        Parser.Statement
-        Parser.Expression
+        Parser.Parsers
         Eval
         Eval.Common
         Eval.Environment

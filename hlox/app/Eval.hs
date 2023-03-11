@@ -1,7 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Eval (evaluateProgram) where
+module Eval (
+    evaluateProgram,
+) where
 
 import Eval.Common (Eval, assignVariable, defineVariable, getVariable, printValue)
 import Eval.Value (Value (..))

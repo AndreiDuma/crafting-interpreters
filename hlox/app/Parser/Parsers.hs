@@ -1,15 +1,53 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Expression where
+module Parser.Parsers where
 
+import Parser.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
 import Parser.Type (Parser)
-import Parser.Lexer (identifierP, lexeme, numberP, symbol)
-import Syntax (Expr (..))
+import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
-import Control.Applicative ((<|>))
 import Data.Foldable (foldl')
 import Data.Function ((&))
-import Text.Megaparsec (choice, many, single, takeWhileP)
+import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, (<|>))
+
+programP :: Parser Program
+programP = spaceP *> (Program <$> many declarationP) <* eof
+
+-- Declarations
+
+declarationP :: Parser Declaration
+declarationP =
+    choice
+        [ varDeclP
+        , statementP
+        ]
+
+varDeclP :: Parser Declaration
+varDeclP =
+    VarDecl
+        <$> (symbol "var" *> identifierP)
+        <*> optional (symbol "=" *> exprP)
+        <* symbol ";"
+
+statementP :: Parser Declaration
+statementP = Statement <$> stmtP
+
+-- Statements
+
+stmtP :: Parser Stmt
+stmtP =
+    choice
+        [ printStmtP
+        , exprStmtP
+        ]
+
+printStmtP :: Parser Stmt
+printStmtP = PrintStmt <$> (symbol "print" *> exprP <* symbol ";")
+
+exprStmtP :: Parser Stmt
+exprStmtP = ExprStmt <$> (exprP <* symbol ";")
+
+-- Expressions
 
 exprP :: Parser Expr
 exprP = logicOrP
