@@ -1,4 +1,4 @@
-module Hlox.Parser.Type (
+module Hlox.Parse.Types (
     Parser,
     ParserError,
 ) where

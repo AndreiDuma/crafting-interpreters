@@ -1,14 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Hlox.Parser.Lexer where
+module Hlox.Parse.Lexer where
 
-import Hlox.Parser.Type (Parser)
+import Hlox.Parse.Types (Parser)
 
-import Control.Applicative ((<|>))
 import Data.Char (isAscii, isDigit, isLetter)
 import Data.Text (Text)
 import Data.Text qualified as T
-import Text.Megaparsec (empty, satisfy, single, takeWhileP, try)
+import Text.Megaparsec (empty, satisfy, single, takeWhileP, try, (<|>))
 import Text.Megaparsec.Char (space1)
 import Text.Megaparsec.Char.Lexer qualified as L
 

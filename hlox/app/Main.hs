@@ -3,8 +3,8 @@
 
 module Main (main) where
 
-import Hlox.Eval (empty, evalEval, evaluateProgram)
-import Hlox.Parser (parseProgram, parserErrorPretty)
+import Hlox.Evaluate (evaluateProgram)
+import Hlox.Parse (parseProgram, parserErrorPretty)
 
 import Data.Text.IO qualified as TIO
 import System.Environment (getArgs)
@@ -24,6 +24,6 @@ runFile path = do
     program <- case parseProgram path source of
         Left err -> TIO.hPutStrLn stderr (parserErrorPretty err) >> exitFailure
         Right program -> pure program
-    evalEval (evaluateProgram program) empty >>= \case
+    evaluateProgram program >>= \case
         Left err -> TIO.hPutStrLn stderr err
         _ -> pure ()

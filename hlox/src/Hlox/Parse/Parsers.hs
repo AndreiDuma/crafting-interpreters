@@ -1,36 +1,38 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Hlox.Parser.Parsers where
+module Hlox.Parse.Parsers where
 
-import Hlox.Parser.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
-import Hlox.Parser.Type (Parser)
-import Hlox.Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
+import Hlox.Parse.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
+import Hlox.Parse.Types (Parser)
+import Hlox.Syntax (Decl (..), Expr (..), Program (..), Stmt (..))
 
 import Data.Foldable (foldl')
 import Data.Function ((&))
 import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, (<|>))
+
+-- Program
 
 programP :: Parser Program
 programP = spaceP *> (Program <$> many declarationP) <* eof
 
 -- Declarations
 
-declarationP :: Parser Declaration
+declarationP :: Parser Decl
 declarationP =
     choice
         [ varDeclP
         , statementP
         ]
 
-varDeclP :: Parser Declaration
+varDeclP :: Parser Decl
 varDeclP =
     VarDecl
         <$> (symbol "var" *> identifierP)
         <*> optional (symbol "=" *> exprP)
         <* symbol ";"
 
-statementP :: Parser Declaration
-statementP = Statement <$> stmtP
+statementP :: Parser Decl
+statementP = StmtDecl <$> stmtP
 
 -- Statements
 

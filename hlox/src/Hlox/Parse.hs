@@ -1,12 +1,12 @@
-module Hlox.Parser (
+module Hlox.Parse (
     Parser,
     ParserError,
     parseProgram,
     parserErrorPretty,
 ) where
 
-import Hlox.Parser.Parsers (programP)
-import Hlox.Parser.Type (Parser, ParserError)
+import Hlox.Parse.Parsers (programP)
+import Hlox.Parse.Types (Parser, ParserError)
 import Hlox.Syntax (Program)
 
 import Data.Text (Text)

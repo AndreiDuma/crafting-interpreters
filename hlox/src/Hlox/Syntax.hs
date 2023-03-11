@@ -1,18 +1,18 @@
 module Hlox.Syntax (
     Program (..),
-    Declaration (..),
+    Decl (..),
     Stmt (..),
     Expr (..),
 ) where
 
 import Data.Text (Text)
 
-newtype Program = Program [Declaration]
+newtype Program = Program [Decl]
     deriving (Eq, Show)
 
-data Declaration
+data Decl
     = VarDecl Text (Maybe Expr)
-    | Statement Stmt
+    | StmtDecl Stmt
     deriving (Eq, Show)
 
 data Stmt
