@@ -74,7 +74,7 @@ executable hlox
         Eval
         Eval.Common
         Eval.Environment
-        Eval.Result
+        Eval.Value
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

@@ -12,7 +12,7 @@ module Eval.Common (
 ) where
 
 import Eval.Environment (Environment, assignVar, defineVar, getVar)
-import Eval.Result (Result (..))
+import Eval.Value (Value (..))
 
 import Control.Monad.Except (ExceptT, liftIO, runExceptT, throwError)
 import Control.Monad.State.Strict (StateT, evalStateT, get, modify', put, runStateT)
@@ -28,24 +28,24 @@ runEval e = runStateT (runExceptT e)
 evalEval :: Eval a -> Environment -> IO (Either Text a)
 evalEval e = evalStateT (runExceptT e)
 
-getVariable :: Text -> Eval Result
+getVariable :: Text -> Eval Value
 getVariable name = do
     env <- get
     case getVar name env of
         Just result -> pure result
         Nothing -> throwError ("Undefined variable " <> name <> ".")
 
-defineVariable :: Text -> Result -> Eval ()
+defineVariable :: Text -> Value -> Eval ()
 defineVariable name value = modify' (defineVar name value)
 
-assignVariable :: Text -> Result -> Eval Result
+assignVariable :: Text -> Value -> Eval Value
 assignVariable name value = do
     env <- get
     case assignVar name value env of
         Just env' -> put env' >> pure value
         Nothing -> throwError ("Undefined variable " <> name <> ".")
 
-printValue :: Result -> Eval ()
+printValue :: Value -> Eval ()
 printValue =
     liftIO . TIO.putStrLn . \case
         Nil -> "nil"

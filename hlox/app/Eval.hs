@@ -4,7 +4,7 @@
 module Eval (evaluateProgram) where
 
 import Eval.Common (Eval, assignVariable, defineVariable, getVariable, printValue)
-import Eval.Result (Result (..))
+import Eval.Value (Value (..))
 import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
 import Control.Monad (void)
@@ -30,7 +30,7 @@ evaluateStmt = \case
     ExprStmt expr -> void $ evaluateExpr expr
     PrintStmt expr -> evaluateExpr expr >>= printValue
 
-evaluateExpr :: Expr -> Eval Result
+evaluateExpr :: Expr -> Eval Value
 evaluateExpr = \case
     Identifier name -> getVariable name
     -- Literals
