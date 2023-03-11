@@ -3,9 +3,7 @@
 
 module Main (main) where
 
-import Eval (evaluateProgram)
-import Eval.Common (evalEval)
-import Eval.Environment (empty)
+import Eval (empty, evalEval, evaluateProgram)
 import Parser (parseProgram, parserErrorPretty)
 
 import Data.Text.IO qualified as TIO

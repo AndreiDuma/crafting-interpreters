@@ -3,9 +3,12 @@
 
 module Eval (
     evaluateProgram,
+    evalEval,
+    empty,
 ) where
 
-import Eval.Common (Eval, assignVariable, defineVariable, getVariable, printValue)
+import Eval.Common (Eval, assignVariable, defineVariable, evalEval, getVariable, printValue)
+import Eval.Environment (empty)
 import Eval.Value (Value (..))
 import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
