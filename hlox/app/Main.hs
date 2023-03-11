@@ -3,8 +3,8 @@
 
 module Main (main) where
 
-import Eval (empty, evalEval, evaluateProgram)
-import Parser (parseProgram, parserErrorPretty)
+import Hlox.Eval (empty, evalEval, evaluateProgram)
+import Hlox.Parser (parseProgram, parserErrorPretty)
 
 import Data.Text.IO qualified as TIO
 import System.Environment (getArgs)

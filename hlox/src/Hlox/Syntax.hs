@@ -1,4 +1,4 @@
-module Syntax (
+module Hlox.Syntax (
     Program (..),
     Declaration (..),
     Stmt (..),

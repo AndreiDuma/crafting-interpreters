@@ -1,4 +1,4 @@
-module Eval.Environment (
+module Hlox.Eval.Environment (
     Environment,
     empty,
     getVar,
@@ -6,10 +6,11 @@ module Eval.Environment (
     assignVar,
 ) where
 
+import Hlox.Eval.Value (Value)
+
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as M
 import Data.Text (Text)
-import Eval.Value (Value)
 
 newtype Environment = Environment
     { getEnvironment :: Map Text Value

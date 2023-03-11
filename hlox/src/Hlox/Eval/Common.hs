@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Eval.Common (
+module Hlox.Eval.Common (
     Eval,
     runEval,
     evalEval,
@@ -11,8 +11,8 @@ module Eval.Common (
     printValue,
 ) where
 
-import Eval.Environment (Environment, assignVar, defineVar, getVar)
-import Eval.Value (Value (..))
+import Hlox.Eval.Environment (Environment, assignVar, defineVar, getVar)
+import Hlox.Eval.Value (Value (..))
 
 import Control.Monad.Except (ExceptT, liftIO, runExceptT, throwError)
 import Control.Monad.State.Strict (StateT, evalStateT, get, modify', put, runStateT)

@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Lexer where
+module Hlox.Parser.Lexer where
 
-import Parser.Type (Parser)
+import Hlox.Parser.Type (Parser)
 
 import Control.Applicative ((<|>))
 import Data.Char (isAscii, isDigit, isLetter)

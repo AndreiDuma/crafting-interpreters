@@ -1,4 +1,4 @@
-module Eval.Value (
+module Hlox.Eval.Value (
     Value (..),
 ) where
 

@@ -27,16 +27,16 @@ common warnings
 library
     import:           warnings
 
-    exposed-modules:  Syntax
-                      Parser
-                      Eval
+    exposed-modules:  Hlox.Syntax
+                      Hlox.Parser
+                      Hlox.Eval
 
-    other-modules:    Eval.Common
-                      Eval.Environment
-                      Eval.Value
-                      Parser.Type
-                      Parser.Lexer
-                      Parser.Parsers
+    other-modules:    Hlox.Eval.Common
+                      Hlox.Eval.Environment
+                      Hlox.Eval.Value
+                      Hlox.Parser.Type
+                      Hlox.Parser.Lexer
+                      Hlox.Parser.Parsers
 
     build-depends:    base ^>= 4.17.0.0,
                       containers,

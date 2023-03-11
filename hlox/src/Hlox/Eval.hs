@@ -1,16 +1,16 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Eval (
+module Hlox.Eval (
     evaluateProgram,
     evalEval,
     empty,
 ) where
 
-import Eval.Common (Eval, assignVariable, defineVariable, evalEval, getVariable, printValue)
-import Eval.Environment (empty)
-import Eval.Value (Value (..))
-import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
+import Hlox.Eval.Common (Eval, assignVariable, defineVariable, evalEval, getVariable, printValue)
+import Hlox.Eval.Environment (empty)
+import Hlox.Eval.Value (Value (..))
+import Hlox.Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
 import Control.Monad (void)
 import Control.Monad.Except (throwError)

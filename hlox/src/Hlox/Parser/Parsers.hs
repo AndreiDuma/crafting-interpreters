@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Parsers where
+module Hlox.Parser.Parsers where
 
-import Parser.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
-import Parser.Type (Parser)
-import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
+import Hlox.Parser.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
+import Hlox.Parser.Type (Parser)
+import Hlox.Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
 import Data.Foldable (foldl')
 import Data.Function ((&))
