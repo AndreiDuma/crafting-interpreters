@@ -3,19 +3,18 @@
 module Parser where
 
 import Parser.Common (Parser)
-import Parser.Lexer (lexeme, parseIdentifier, spaceConsumer, symbol)
+import Parser.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
 import Syntax (Declaration (..), Expr (..), Program (..), Stmt (..))
 
 import Control.Applicative ((<|>))
 import Data.Foldable (foldl')
 import Data.Function ((&))
-import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, try)
-import Text.Megaparsec.Char.Lexer qualified as L
+import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP)
 
 -- Program
 
 programP :: Parser Program
-programP = spaceConsumer *> (Program <$> many declarationP) <* eof
+programP = spaceP *> (Program <$> many declarationP) <* eof
 
 -- Declaration
 
@@ -29,7 +28,7 @@ declarationP =
 varDeclP :: Parser Declaration
 varDeclP =
     VarDecl
-        <$> (symbol "var" *> parseIdentifier)
+        <$> (symbol "var" *> identifierP)
         <*> optional (symbol "=" *> exprP)
         <* symbol ";"
 
@@ -92,31 +91,13 @@ unaryP =
 primaryP :: Parser Expr
 primaryP =
     choice
-        [ nilP
-        , literalBooleanP
-        , literalNumberP
-        , literalStringP
-        , identifierP
-        , groupingP
+        [ LiteralNil <$ symbol "nil"
+        , LiteralBoolean <$> (True <$ symbol "true" <|> False <$ symbol "false")
+        , LiteralNumber <$> numberP
+        , LiteralString <$> lexeme (single '"' *> takeWhileP Nothing (/= '"') <* single '"')
+        , Identifier <$> identifierP
+        , Grouping <$> (symbol "(" *> exprP <* symbol ")")
         ]
-
-identifierP :: Parser Expr
-identifierP = Identifier <$> parseIdentifier
-
-nilP :: Parser Expr
-nilP = LiteralNil <$ symbol "nil"
-
-literalBooleanP :: Parser Expr
-literalBooleanP = LiteralBoolean <$> (True <$ symbol "true" <|> False <$ symbol "false")
-
-literalNumberP :: Parser Expr
-literalNumberP = LiteralNumber <$> lexeme (try L.float <|> L.decimal)
-
-literalStringP :: Parser Expr
-literalStringP = LiteralString <$> lexeme (single '"' *> takeWhileP Nothing (/= '"') <* single '"')
-
-groupingP :: Parser Expr
-groupingP = Grouping <$> (symbol "(" *> exprP <* symbol ")")
 
 -- Utilities
 
