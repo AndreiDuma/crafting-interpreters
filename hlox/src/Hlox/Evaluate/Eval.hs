@@ -4,6 +4,7 @@
 module Hlox.Evaluate.Eval (
     Eval,
     evalEval,
+    withLocalScope,
     assignVariable,
     defineVariable,
     getVariable,
@@ -15,7 +16,7 @@ import Hlox.Evaluate.Environment qualified as Env
 import Hlox.Evaluate.Value (Value (..))
 
 import Control.Monad.Except (ExceptT, liftIO, runExceptT, throwError)
-import Control.Monad.State.Strict (StateT, evalStateT, get, modify', put)
+import Control.Monad.State.Strict (StateT, evalStateT, get, gets, modify', put)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
@@ -24,6 +25,18 @@ type Eval a = ExceptT Text (StateT Environment IO) a
 
 evalEval :: Eval a -> Environment -> IO (Either Text a)
 evalEval e = evalStateT (runExceptT e)
+
+withLocalScope :: Eval a -> Eval a
+withLocalScope e = do
+    -- create local scope
+    modify' Env.local
+    -- evaluate `e` in local scope
+    result <- e
+    -- restore enclosing scope
+    gets Env.enclosing >>= \case
+        Just env -> put env
+        Nothing -> throwError "No enclosing environment. This is a bug."
+    pure result
 
 assignVariable :: Text -> Value -> Eval Value
 assignVariable name value = do

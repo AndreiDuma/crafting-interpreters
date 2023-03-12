@@ -1,6 +1,7 @@
 module Hlox.Evaluate.Environment (
-    Environment,
-    empty,
+    Environment (enclosing),
+    global,
+    local,
     getVariable,
     defineVariable,
     assignVariable,
@@ -8,25 +9,30 @@ module Hlox.Evaluate.Environment (
 
 import Hlox.Evaluate.Value (Value)
 
+import Control.Applicative ((<|>))
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as M
 import Data.Text (Text)
 
-newtype Environment = Environment
-    { getEnvironment :: Map Text Value
+data Environment = Environment
+    { enclosing :: Maybe Environment
+    , get :: Map Text Value
     }
 
-empty :: Environment
-empty = Environment M.empty
+global :: Environment
+global = Environment Nothing M.empty
+
+local :: Environment -> Environment
+local env = Environment (Just env) M.empty
 
 getVariable :: Text -> Environment -> Maybe Value
-getVariable name = M.lookup name . getEnvironment
+getVariable name env = M.lookup name (get env) <|> (enclosing env >>= getVariable name)
 
 defineVariable :: Text -> Value -> Environment -> Environment
-defineVariable name value = Environment . M.insert name value . getEnvironment
+defineVariable name value env = Environment (enclosing env) (M.insert name value $ get env)
 
 assignVariable :: Text -> Value -> Environment -> Maybe Environment
 assignVariable name value env =
-    if M.member name $ getEnvironment env
-        then Just (Environment $ M.insert name value $ getEnvironment env)
-        else Nothing
+    if M.member name (get env)
+        then pure $ Environment (enclosing env) (M.insert name value $ get env)
+        else enclosing env >>= assignVariable name value

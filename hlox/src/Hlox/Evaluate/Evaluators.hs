@@ -3,7 +3,7 @@
 
 module Hlox.Evaluate.Evaluators where
 
-import Hlox.Evaluate.Eval (Eval, assignVariable, defineVariable, getVariable, printValue)
+import Hlox.Evaluate.Eval (Eval, assignVariable, defineVariable, getVariable, printValue, withLocalScope)
 import Hlox.Evaluate.Value (Value (..))
 import Hlox.Syntax (
     Decl (..),
@@ -30,7 +30,7 @@ declEval = \case
 
 stmtEval :: Stmt -> Eval ()
 stmtEval = \case
-    BlockStmt decls -> traverse_ declEval decls
+    BlockStmt decls -> withLocalScope $ traverse_ declEval decls
     PrintStmt expr -> exprEval expr >>= printValue
     ExprStmt expr -> void $ exprEval expr
 
