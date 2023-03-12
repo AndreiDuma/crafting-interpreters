@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Hlox.Evaluate.Environment (
     Environment (enclosing),
     global,
@@ -31,15 +33,15 @@ local env = Environment (Just env) M.empty
 
 -- | Get a variable from the current scope or any enclosing scope.
 getVariable :: Text -> Environment -> Maybe Value
-getVariable name Environment{enclosing, variables} = M.lookup name variables <|> (enclosing >>= getVariable name)
+getVariable name Environment{..} = M.lookup name variables <|> (enclosing >>= getVariable name)
 
 -- | Define a variable in the current scope.
 defineVariable :: Text -> Value -> Environment -> Environment
-defineVariable name value env@Environment{variables} = env{variables = M.insert name value variables}
+defineVariable name value env@Environment{..} = env{variables = M.insert name value variables}
 
 -- | Assign a variable in the current scope or any enclosing scope.
 assignVariable :: Text -> Value -> Environment -> Maybe Environment
-assignVariable name value env@Environment{enclosing, variables} =
+assignVariable name value env@Environment{..} =
     if M.member name variables
         then -- if variable is defined in current scope, assign it
             pure env{variables = M.insert name value variables}
