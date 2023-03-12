@@ -30,8 +30,9 @@ declEval = \case
 
 stmtEval :: Stmt -> Eval ()
 stmtEval = \case
-    ExprStmt expr -> void $ exprEval expr
+    BlockStmt decls -> traverse_ declEval decls
     PrintStmt expr -> exprEval expr >>= printValue
+    ExprStmt expr -> void $ exprEval expr
 
 exprEval :: Expr -> Eval Value
 exprEval = \case

@@ -16,8 +16,9 @@ data Decl
     deriving (Eq, Show)
 
 data Stmt
-    = ExprStmt Expr
+    = BlockStmt [Decl]
     | PrintStmt Expr
+    | ExprStmt Expr
     deriving (Eq, Show)
 
 data Expr

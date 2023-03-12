@@ -39,9 +39,13 @@ statementP = StmtDecl <$> stmtP
 stmtP :: Parser Stmt
 stmtP =
     choice
-        [ printStmtP
+        [ blockStmtP
+        , printStmtP
         , exprStmtP
         ]
+
+blockStmtP :: Parser Stmt
+blockStmtP = BlockStmt <$> (symbol "{" *> many declarationP <* symbol "}")
 
 printStmtP :: Parser Stmt
 printStmtP = PrintStmt <$> (symbol "print" *> exprP <* symbol ";")
