@@ -40,12 +40,20 @@ stmtP :: Parser Stmt
 stmtP =
     choice
         [ blockStmtP
+        , ifStmtP
         , printStmtP
         , exprStmtP
         ]
 
 blockStmtP :: Parser Stmt
 blockStmtP = BlockStmt <$> (symbol "{" *> many declarationP <* symbol "}")
+
+ifStmtP :: Parser Stmt
+ifStmtP =
+    IfStmt
+        <$> (symbol "if" *> symbol "(" *> exprP <* symbol ")")
+        <*> stmtP
+        <*> optional (symbol "else" *> stmtP)
 
 printStmtP :: Parser Stmt
 printStmtP = PrintStmt <$> (symbol "print" *> exprP <* symbol ";")
@@ -78,8 +86,8 @@ comparisonP :: Parser Expr
 comparisonP =
     binaryExpr termP $
         choice
-            [ Greater <$ symbol ">"
-            , GreaterOrEqual <$ symbol ">="
+            [ GreaterOrEqual <$ symbol ">="
+            , Greater <$ symbol ">"
             , Less <$ symbol "<"
             , LessOrEqual <$ symbol "<="
             ]

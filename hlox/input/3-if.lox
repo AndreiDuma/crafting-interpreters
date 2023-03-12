@@ -1,0 +1,13 @@
+var x = 3;
+
+if (x == 0) {
+    print "zero!";
+} else if (x > 0) {
+    print "strictly positive!";
+} else {
+    print "negative!";
+}
+
+if (true) {
+    print "an if without an else branch also works.";
+}

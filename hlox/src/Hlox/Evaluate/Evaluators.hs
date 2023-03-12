@@ -31,6 +31,11 @@ declEval = \case
 stmtEval :: Stmt -> Eval ()
 stmtEval = \case
     BlockStmt decls -> withLocalScope $ traverse_ declEval decls
+    IfStmt cond thenStmt elseStmt -> do
+        result <- exprEval cond
+        if isTruthy result
+            then stmtEval thenStmt
+            else traverse_ stmtEval elseStmt
     PrintStmt expr -> exprEval expr >>= printValue
     ExprStmt expr -> void $ exprEval expr
 
@@ -89,10 +94,6 @@ exprEval = \case
     -- Parentheses
     Grouping expr -> exprEval expr
   where
-    isTruthy expr = case expr of
-        Nil -> False
-        Boolean False -> False
-        _ -> True
     numberOperation op left right = do
         leftR <- left
         rightR <- right
@@ -105,3 +106,11 @@ exprEval = \case
         case (leftR, rightR) of
             (Number l, Number r) -> pure $ Boolean (l `op` r)
             _ -> throwError "Operands must be numbers."
+
+-- Utilities
+
+isTruthy :: Value -> Bool
+isTruthy expr = case expr of
+    Nil -> False
+    Boolean False -> False
+    _ -> True
