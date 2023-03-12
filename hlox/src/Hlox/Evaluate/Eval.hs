@@ -3,7 +3,7 @@
 
 module Hlox.Evaluate.Eval (
     Eval,
-    evalEval,
+    runEval,
     withLocalScope,
     assignVariable,
     defineVariable,
@@ -23,8 +23,8 @@ import Data.Text.IO qualified as TIO
 
 type Eval a = ExceptT Text (StateT Environment IO) a
 
-evalEval :: Eval a -> Environment -> IO (Either Text a)
-evalEval e = evalStateT (runExceptT e)
+runEval :: Eval a -> IO (Either Text a)
+runEval e = evalStateT (runExceptT e) Env.global
 
 withLocalScope :: Eval a -> Eval a
 withLocalScope e = do
