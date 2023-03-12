@@ -8,7 +8,7 @@ import Hlox.Syntax (Decl (..), Expr (..), Program (..), Stmt (..))
 
 import Data.Foldable (foldl')
 import Data.Function ((&))
-import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, (<|>))
+import Text.Megaparsec (choice, eof, many, optional, single, takeWhileP, try, (<|>))
 
 -- Program
 
@@ -56,7 +56,14 @@ exprStmtP = ExprStmt <$> (exprP <* symbol ";")
 -- Expressions
 
 exprP :: Parser Expr
-exprP = logicOrP
+exprP = assignmentP
+
+assignmentP :: Parser Expr
+assignmentP =
+    choice
+        [ try $ Assignment <$> identifierP <*> (symbol "=" *> exprP)
+        , logicOrP
+        ]
 
 logicOrP :: Parser Expr
 logicOrP = binaryExpr logicAndP (Or <$ symbol "or")

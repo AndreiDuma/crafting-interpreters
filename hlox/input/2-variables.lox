@@ -2,6 +2,8 @@
     var a = 1;
     var b = 2;
     {
-        print a + b;
+        var c = a + b;
+        c = c + 1;
+        print c;
     }
 }
