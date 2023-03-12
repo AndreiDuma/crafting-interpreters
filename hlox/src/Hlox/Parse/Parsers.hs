@@ -41,6 +41,7 @@ stmtP =
     choice
         [ blockStmtP
         , ifStmtP
+        , whileStmt
         , printStmtP
         , exprStmtP
         ]
@@ -54,6 +55,9 @@ ifStmtP =
         <$> (symbol "if" *> symbol "(" *> exprP <* symbol ")")
         <*> stmtP
         <*> optional (symbol "else" *> stmtP)
+
+whileStmt :: Parser Stmt
+whileStmt = WhileStmt <$> (symbol "while" *> symbol "(" *> exprP <* symbol ")") <*> stmtP
 
 printStmtP :: Parser Stmt
 printStmtP = PrintStmt <$> (symbol "print" *> exprP <* symbol ";")

@@ -38,21 +38,21 @@ withLocalScope e = do
         Nothing -> throwError "No enclosing environment. This is a bug."
     pure result
 
-assignVariable :: Text -> Value -> Eval Value
-assignVariable name value = do
-    env <- get
-    case Env.assignVariable name value env of
-        Just env' -> put env' >> pure value
-        Nothing -> throwError ("Undefined variable " <> name <> ".")
-
-defineVariable :: Text -> Value -> Eval ()
-defineVariable name value = modify' (Env.defineVariable name value)
-
 getVariable :: Text -> Eval Value
 getVariable name = do
     env <- get
     case Env.getVariable name env of
         Just result -> pure result
+        Nothing -> throwError ("Undefined variable " <> name <> ".")
+
+defineVariable :: Text -> Value -> Eval ()
+defineVariable name value = modify' (Env.defineVariable name value)
+
+assignVariable :: Text -> Value -> Eval Value
+assignVariable name value = do
+    env <- get
+    case Env.assignVariable name value env of
+        Just env' -> put env' >> pure value
         Nothing -> throwError ("Undefined variable " <> name <> ".")
 
 printValue :: Value -> Eval ()

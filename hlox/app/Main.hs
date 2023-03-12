@@ -24,6 +24,7 @@ runFile path = do
     program <- case parseProgram path source of
         Left err -> TIO.hPutStrLn stderr (parserErrorPretty err) >> exitFailure
         Right program -> pure program
+    -- print program
     evaluateProgram program >>= \case
         Left err -> TIO.hPutStrLn stderr err
         _ -> pure ()

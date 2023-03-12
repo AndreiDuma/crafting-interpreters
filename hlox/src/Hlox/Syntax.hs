@@ -18,6 +18,7 @@ data Decl
 data Stmt
     = BlockStmt [Decl]
     | IfStmt Expr Stmt (Maybe Stmt)
+    | WhileStmt Expr Stmt
     | PrintStmt Expr
     | ExprStmt Expr
     deriving (Eq, Show)

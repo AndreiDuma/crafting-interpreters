@@ -12,7 +12,7 @@ import Hlox.Syntax (
     Stmt (..),
  )
 
-import Control.Monad (void)
+import Control.Monad (void, when)
 import Control.Monad.Except (throwError)
 import Data.Foldable (traverse_)
 
@@ -36,6 +36,9 @@ stmtEval = \case
         if isTruthy result
             then stmtEval thenStmt
             else traverse_ stmtEval elseStmt
+    WhileStmt cond body -> do
+        result <- exprEval cond
+        when (isTruthy result) $ stmtEval body >> stmtEval (WhileStmt cond body)
     PrintStmt expr -> exprEval expr >>= printValue
     ExprStmt expr -> void $ exprEval expr
 
