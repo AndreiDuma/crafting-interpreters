@@ -15,6 +15,7 @@ author:             Andrei Dorian Duma
 maintainer:         andrei@andreiduma.ro
 copyright:          Andrei Dorian Duma 2023
 category:           Language
+
 build-type:         Simple
 extra-doc-files:    CHANGELOG.md
 

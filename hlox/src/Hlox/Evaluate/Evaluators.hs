@@ -21,8 +21,8 @@ programEval (Program declarations) = traverse_ declEval declarations
 
 declEval :: Decl -> Eval ()
 declEval = \case
-    VarDecl name expr -> do
-        value <- case expr of
+    VarDecl name mExpr -> do
+        value <- case mExpr of
             Just e -> exprEval e
             Nothing -> pure Nil
         defineVariable name value
@@ -31,11 +31,11 @@ declEval = \case
 stmtEval :: Stmt -> Eval ()
 stmtEval = \case
     BlockStmt decls -> withLocalScope $ traverse_ declEval decls
-    IfStmt cond thenStmt elseStmt -> do
+    IfStmt cond thenStmt mElseStmt -> do
         result <- exprEval cond
         if isTruthy result
             then stmtEval thenStmt
-            else traverse_ stmtEval elseStmt
+            else traverse_ stmtEval mElseStmt
     WhileStmt cond body -> do
         result <- exprEval cond
         when (isTruthy result) $ stmtEval body >> stmtEval (WhileStmt cond body)
