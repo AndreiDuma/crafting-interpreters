@@ -10,10 +10,11 @@ import Hlox.Syntax (
     Expr (..),
     Program (..),
     Stmt (..),
+    VarDeclParams (..),
  )
 
 import Control.Monad (void, when)
-import Control.Monad.Except (throwError)
+import Control.Monad.Except (liftIO, throwError)
 import Data.Foldable (traverse_)
 
 programEval :: Program -> Eval ()
@@ -21,7 +22,7 @@ programEval (Program declarations) = traverse_ declEval declarations
 
 declEval :: Decl -> Eval ()
 declEval = \case
-    VarDecl name mExpr -> do
+    VarDecl (VarDeclParams name mExpr) -> do
         value <- case mExpr of
             Just e -> exprEval e
             Nothing -> pure Nil
@@ -32,13 +33,21 @@ stmtEval :: Stmt -> Eval ()
 stmtEval = \case
     BlockStmt decls -> withLocalScope $ traverse_ declEval decls
     IfStmt cond thenStmt mElseStmt -> do
-        result <- exprEval cond
-        if isTruthy result
+        test <- exprEval cond
+        if isTruthy test
             then stmtEval thenStmt
             else traverse_ stmtEval mElseStmt
     WhileStmt cond body -> do
-        result <- exprEval cond
-        when (isTruthy result) $ stmtEval body >> stmtEval (WhileStmt cond body)
+        test <- exprEval cond
+        when (isTruthy test) $
+            stmtEval body >> stmtEval (WhileStmt cond body)
+    ForStmt mInit mCond mStep body -> do
+        traverse_ declEval (VarDecl <$> mInit)
+        test <- maybe (pure $ Boolean True) exprEval mCond
+        when (isTruthy test) $ do
+            stmtEval body
+            traverse_ exprEval mStep
+            stmtEval (ForStmt Nothing mCond mStep body)
     PrintStmt expr -> exprEval expr >>= printValue
     ExprStmt expr -> void $ exprEval expr
 
@@ -77,7 +86,7 @@ exprEval = \case
             (Number l, Number r) -> pure $ Number (l + r)
             (String l, String r) -> pure $ String (l <> r)
             _ -> throwError "Operands must be two numbers or two strings."
-    Minus left right -> numberOperation (+) (exprEval left) (exprEval right)
+    Minus left right -> numberOperation (-) (exprEval left) (exprEval right)
     Star left right -> numberOperation (*) (exprEval left) (exprEval right)
     Slash left right -> numberOperation (/) (exprEval left) (exprEval right)
     -- Comparison operators

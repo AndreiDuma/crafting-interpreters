@@ -1,0 +1,16 @@
+var n = 5;
+
+for (var i = 0; i < n; i = i + 1) {
+    print i;
+}
+
+for (; n > 0;) {
+    n = n - 1;
+    print n;
+}
+
+// for (n = 20; n < 25; n = n + 1) {
+//     print n;
+// }
+
+print "done.";

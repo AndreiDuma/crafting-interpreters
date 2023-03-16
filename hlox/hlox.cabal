@@ -42,6 +42,7 @@ library
 
     build-depends:    base ^>= 4.17.0.0,
                       containers,
+                      extra,
                       megaparsec ^>= 9.3.0,
                       mtl,
                       text

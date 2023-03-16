@@ -4,7 +4,7 @@ module Hlox.Parse.Parsers where
 
 import Hlox.Parse.Lexer (identifierP, lexeme, numberP, spaceP, symbol)
 import Hlox.Parse.Types (Parser)
-import Hlox.Syntax (Decl (..), Expr (..), Program (..), Stmt (..))
+import Hlox.Syntax (Decl (..), Expr (..), Program (..), Stmt (..), VarDeclParams (..))
 
 import Data.Foldable (foldl')
 import Data.Function ((&))
@@ -25,8 +25,11 @@ declarationP =
         ]
 
 varDeclP :: Parser Decl
-varDeclP =
-    VarDecl
+varDeclP = VarDecl <$> varDeclParamsP
+
+varDeclParamsP :: Parser VarDeclParams
+varDeclParamsP =
+    VarDeclParams
         <$> (symbol "var" *> identifierP)
         <*> optional (symbol "=" *> exprP)
         <* symbol ";"
@@ -42,6 +45,7 @@ stmtP =
         [ blockStmtP
         , ifStmtP
         , whileStmt
+        , forStmt
         , printStmtP
         , exprStmtP
         ]
@@ -58,6 +62,20 @@ ifStmtP =
 
 whileStmt :: Parser Stmt
 whileStmt = WhileStmt <$> (symbol "while" *> symbol "(" *> exprP <* symbol ")") <*> stmtP
+
+forStmt :: Parser Stmt
+forStmt =
+    ForStmt
+        <$> ( symbol "for"
+                *> symbol "("
+                *> choice
+                    [ Just <$> varDeclParamsP
+                    , Nothing <$ symbol ";"
+                    ]
+            )
+        <*> (optional exprP <* symbol ";")
+        <*> (optional exprP <* symbol ")")
+        <*> stmtP
 
 printStmtP :: Parser Stmt
 printStmtP = PrintStmt <$> (symbol "print" *> exprP <* symbol ";")

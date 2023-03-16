@@ -1,6 +1,7 @@
 module Hlox.Syntax (
     Program (..),
     Decl (..),
+    VarDeclParams (..),
     Stmt (..),
     Expr (..),
 ) where
@@ -11,14 +12,18 @@ newtype Program = Program [Decl]
     deriving (Eq, Show)
 
 data Decl
-    = VarDecl Text (Maybe Expr)
+    = VarDecl VarDeclParams
     | StmtDecl Stmt
+    deriving (Eq, Show)
+
+data VarDeclParams = VarDeclParams Text (Maybe Expr)
     deriving (Eq, Show)
 
 data Stmt
     = BlockStmt [Decl]
     | IfStmt Expr Stmt (Maybe Stmt)
     | WhileStmt Expr Stmt
+    | ForStmt (Maybe VarDeclParams) (Maybe Expr) (Maybe Expr) Stmt
     | PrintStmt Expr
     | ExprStmt Expr
     deriving (Eq, Show)
