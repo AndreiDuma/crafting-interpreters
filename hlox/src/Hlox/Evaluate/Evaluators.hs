@@ -14,7 +14,7 @@ import Hlox.Syntax (
  )
 
 import Control.Monad (void, when)
-import Control.Monad.Except (liftIO, throwError)
+import Control.Monad.Except (throwError)
 import Data.Foldable (traverse_)
 
 programEval :: Program -> Eval ()
@@ -22,12 +22,15 @@ programEval (Program declarations) = traverse_ declEval declarations
 
 declEval :: Decl -> Eval ()
 declEval = \case
-    VarDecl (VarDeclParams name mExpr) -> do
-        value <- case mExpr of
-            Just e -> exprEval e
-            Nothing -> pure Nil
-        defineVariable name value
+    VarDecl params -> varDeclParamsEval params
     StmtDecl stmt -> stmtEval stmt
+
+varDeclParamsEval :: VarDeclParams -> Eval ()
+varDeclParamsEval (VarDeclParams name mExpr) = do
+    value <- case mExpr of
+        Just e -> exprEval e
+        Nothing -> pure Nil
+    defineVariable name value
 
 stmtEval :: Stmt -> Eval ()
 stmtEval = \case
@@ -42,7 +45,7 @@ stmtEval = \case
         when (isTruthy test) $
             stmtEval body >> stmtEval (WhileStmt cond body)
     ForStmt mInit mCond mStep body -> do
-        traverse_ declEval (VarDecl <$> mInit)
+        traverse_ (either varDeclParamsEval (void . exprEval)) mInit
         test <- maybe (pure $ Boolean True) exprEval mCond
         when (isTruthy test) $ do
             stmtEval body

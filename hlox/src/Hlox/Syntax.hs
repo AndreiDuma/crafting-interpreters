@@ -23,7 +23,11 @@ data Stmt
     = BlockStmt [Decl]
     | IfStmt Expr Stmt (Maybe Stmt)
     | WhileStmt Expr Stmt
-    | ForStmt (Maybe VarDeclParams) (Maybe Expr) (Maybe Expr) Stmt
+    | ForStmt
+        (Maybe (Either VarDeclParams Expr))
+        (Maybe Expr)
+        (Maybe Expr)
+        Stmt
     | PrintStmt Expr
     | ExprStmt Expr
     deriving (Eq, Show)

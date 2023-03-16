@@ -9,8 +9,8 @@ for (; n > 0;) {
     print n;
 }
 
-// for (n = 20; n < 25; n = n + 1) {
-//     print n;
-// }
+for (n = 20; n < 25; n = n + 1) {
+    print n;
+}
 
 print "done.";

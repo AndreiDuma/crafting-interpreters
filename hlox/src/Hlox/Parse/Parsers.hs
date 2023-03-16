@@ -69,7 +69,8 @@ forStmt =
         <$> ( symbol "for"
                 *> symbol "("
                 *> choice
-                    [ Just <$> varDeclParamsP
+                    [ Just . Left <$> varDeclParamsP
+                    , Just . Right <$> exprP <* symbol ";"
                     , Nothing <$ symbol ";"
                     ]
             )
